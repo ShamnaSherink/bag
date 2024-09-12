@@ -1,0 +1,1130 @@
+const LOGIN_IFRAME_HOST = 'https://pdp.gokwik.co/checkout-enhancer/index.html';
+// Dev - https://dev.pdp.gokwik.co/checkout-enhancer/index.html
+// Qa - https://qa.pdp.gokwik.co/checkout-enhancer/index.html
+// Sandbox - https://sandbox.pdp.gokwik.co/checkout-enhancer/index.html
+// Production - https://pdp.gokwik.co/checkout-enhancer/index.html
+
+const HITS_HOST = 'https://hits.gokwik.co';
+// Dev - https://sandbox-hits.gokwik.co
+// Qa - https://qa-hits.gokwik.co
+// Sandbox - https://sandbox-hits.gokwik.co
+// Production - https://hits.gokwik.co
+
+const KWIK_SESSION_TOKEN_KEY = 'KWIKSESSIONTOKEN';
+// Dev - SANDBOXKWIKSESSIONTOKEN
+// Qa - QAKWIKSESSIONTOKEN
+// Sandbox - SANDBOXKWIKSESSIONTOKEN
+// Production - KWIKSESSIONTOKEN
+
+const KWIK_SIGNED_IN = 'KWIKSIGNEDIN';
+// Dev - SANDBOXKWIKSIGNEDIN
+// Qa - QAKWIKSIGNEDIN
+// Sandbox - SANDBOXKWIKSIGNEDIN
+// Production - KWIKSIGNEDIN
+
+const TRUECALLER_PARTNER_KEY = '8mf4fc98b53b622d94edc87c225d6096325f8';
+// Dev - dTG30d2de716a74ba4ab7b451cff60b2a4dd5
+// Qa - nkC7Q3d51583857ba4b88aa025a744cb75ef1
+// Sandbox - 3nA4i1d7c49eccdf0487282c3f767f83735ae
+// Production - 8mf4fc98b53b622d94edc87c225d6096325f8
+
+const API_URL = 'https://prod-shp-checkout.gokwik.co';
+// Dev - https://dev-shp-checkout.dev.gokwik.in
+// Qa - https://qa-shp-checkout.dev.gokwik.in
+// Sandbox - https://sandbox-shp-checkout.dev.gokwik.in
+// Production - https://prod-shp-checkout.gokwik.co
+
+const AB_SERVICE_HOST = 'https://gkx.gokwik.co';
+// Dev = 'https://api-gw-v4.dev.gokwik.io/dev'
+// Production = "https://gkx.gokwik.co"
+
+const gkModal = document.getElementById('gk-modal');
+const gkBtn = document.getElementById('gk-open-modal-btn');
+let currentCartGk;
+let requestId;
+let redirectingToCheckoutFlag = false;
+let isTenDigitPhoneFormat = false;
+let gKexpCustomerId;
+let gKuserExperiments = [];
+let gkVariant = {};
+let gkCss = "";
+let gkABTestingEnabled = window.gkABTestingEnabled
+let gkMerchantId = window.gkMerchantId
+let gkCart;
+
+//set-utm-parameters
+const gk_merchant_url = new URL(window.location.href);
+const gkMktMedium = gk_merchant_url.searchParams.get('utm_medium');
+const gkMktSource = gk_merchant_url.searchParams.get('utm_source');
+const gkMktCampaign = gk_merchant_url.searchParams.get('utm_campaign');
+const gkSource = gk_merchant_url.href;
+const gkLandingPage = gk_merchant_url.origin;
+const adSource = window.location.href.split('?').length > 1 ? window.location.href.split('?')[1] : undefined;
+
+if (gkMktMedium !== null) {
+	sessionStorage.setItem('gkMktMedium', gkMktMedium);
+}
+if (gkMktSource !== null) {
+	sessionStorage.setItem('gkMktSource', gkMktSource);
+}
+if (gkMktCampaign !== null) {
+	sessionStorage.setItem('gkMktCampaign', gkMktCampaign);
+}
+if (gkSource !== null) {
+	sessionStorage.setItem('gkSource', gkSource);
+}
+if (gkLandingPage !== null) {
+	sessionStorage.setItem('gkLandingPage', gkLandingPage);
+}
+
+if (gkABTestingEnabled === "true") {
+	if (!localStorage.getItem('gk_user_id')) {
+		gKexpCustomerId = Math.floor(1000000000000000 + Math.random() * 9000000000000000).toString();
+		localStorage.setItem('gk_user_id', gKexpCustomerId);
+	} else {
+		gKexpCustomerId = localStorage.getItem('gk_user_id');
+	}    
+}  
+
+let experimentsApiConfig = {
+    getVariants: '/v3/experiment/api/get_user_variant',
+    getExperiments: '/v3/experiment/api/experiments',
+}
+let experimentVariants = {
+	SHIPROCKET_CHECKOUT: 'shiprocket-checkout-button',
+	KWIK_CHECKOUT: "kwik-checkout-button",
+	SHOPIFY_NATIVE_CHECKOUT: 'shopify-native-checkout'
+}
+
+async function getUserExperiments() {
+	try {
+		const baseUrl = AB_SERVICE_HOST + experimentsApiConfig.getExperiments;
+    	const urlWithParams = `${baseUrl}?merchant_id=${window.gkMerchantId}`;
+		const response = await fetch(urlWithParams, {
+		  method: "GET",
+		  headers: {
+			"Content-Type": "application/json",
+			"x-gokwik-origin": window.location.origin,
+		  },
+		});
+		const responseData = await response.json();
+		gKuserExperiments = Object.values(responseData?.data || {});
+	} catch (error) {
+		console.error(error);
+	}
+
+	await fetchVariants('checkout_buttons_ab');
+}
+
+async function fetchVariants(expName) {
+	gkVariant = await getUserVariant(expName)
+	if (gKuserExperiments.length) {
+		gkCart.attributes.exp_customer_id = gKexpCustomerId;
+		gkCart.attributes.merchant_id = window.gkMerchantId;
+		gkCart.attributes.variant_name = gkVariant?.variant_name;
+		updateGkCart('', '', '', gKexpCustomerId, window.gkMerchantId, gkVariant?.variant_name);
+	}
+	switch (gkVariant?.variant_name ?? '') {
+        case experimentVariants.SHIPROCKET_CHECKOUT:
+			Decidefun(experimentVariants.SHIPROCKET_CHECKOUT)
+        	break;
+        case experimentVariants.KWIK_CHECKOUT:
+        	Decidefun(experimentVariants.KWIK_CHECKOUT)
+        	break;
+		case experimentVariants.SHOPIFY_NATIVE_CHECKOUT:
+        	Decidefun(experimentVariants.SHOPIFY_NATIVE_CHECKOUT)
+        	break;
+    }
+}
+
+function Decidefun(valuetodecide) {
+    if (valuetodecide === "shopify-native-checkout") {
+		gkCss = `
+		.gokwik-buynow-btn {display:none;}
+		.gokwik_checkout_btn_ab {display:none;}
+		.shopify_native_checkout_btn {display:block !important;}
+		.shopify_native_buynow_btn {display:block !important;}
+		`
+		const shopifyButtons = [".shopify_native_checkout_btn", ".shopify_native_buynow_btn"];
+		shopifyButtons.forEach(selector => {
+			const button = document.querySelector(selector);
+			if (button) {
+				button.addEventListener("click", experimentAnalyticsEvent);
+			}
+		});
+    } else if (valuetodecide === "kwik-checkout-button") {
+		gkCss = `
+		.gokwik-buynow-btn {display:block;}
+		.gokwik_checkout_btn_ab {display:block!important;}
+		.shopify_native_checkout_btn {display:none !important;}
+		.shopify_native_buynow_btn {display:none !important;}
+		`
+		const gokwikButtons = [".gokwik_checkout_btn_ab", ".gokwik-buynow-btn"];
+		gokwikButtons.forEach(selector => {
+			const button = document.querySelector(selector);
+			if (button) {
+				button.addEventListener("click", experimentAnalyticsEvent);
+			}
+		});
+    }
+	const styleElement = document.createElement("style");
+	styleElement.textContent = gkCss;
+	document.head.appendChild(styleElement);
+}
+
+function experimentAnalyticsEvent() {
+	analyticsEvent({
+		source: adSource,
+		utm_medium: gkMktMedium, 
+		utm_source: gkMktSource,
+		utm_campaign: gkMktCampaign,
+		gkLandingPage,
+		orig_referrer: document.referrer,
+		shopifySessionId: window.gkShopifySessionId,
+		eventType: 'buttonClick',
+		merchantId: window.gkMerchantId,
+		name: 'ab_checkout_started',
+		type: 'event',
+		data: gkVariant,
+	}, "");
+}
+
+async function getUserVariant(experimentName) {
+	const experiment = gKuserExperiments.find(exp => exp?.name === experimentName);
+    if (!experiment) return null;
+    const { id } = experiment;
+    if(!id) return null;
+	if (experiment.is_deleted || experiment.is_concluded || new Date(experiment.start_date) >= new Date()) {
+        return null;
+    }
+
+	try {
+		const response = await assignUserVariant(id);
+		if (response.status_code == 200) {
+			const userVariant = response?.data;
+			if (userVariant?.variant_name) {
+				return userVariant;
+			}
+		}
+	} catch (err) {
+		console.error(err);
+	}
+}
+
+async function assignUserVariant(experimentId) {
+	if (!gKexpCustomerId) return;
+
+	const payload = {
+	  experiment_id: experimentId,
+	  user_attributes: {
+		m_id: window.gkMerchantId,
+	  },
+		user_id: String(gKexpCustomerId),
+	};
+
+	try {
+        const response = await fetch(AB_SERVICE_HOST + experimentsApiConfig.getVariants, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-gokwik-origin": window.location.origin,
+            },
+            body: JSON.stringify(payload),
+        });
+        const responseData = await response.json();
+        return responseData;
+    } catch (error) {
+        console.error(error);
+    }        
+}
+
+let gkIframe = document.getElementsByClassName('gk-login')[0];
+
+gkIframe.src = `${LOGIN_IFRAME_HOST}`;
+gkIframe.allow = 'otp-credentials';
+const kwikPassEmail = localStorage.getItem('kp_email');
+let gk_checkout_enhancer_cart = {};
+document.getElementsByClassName('loader-content')[0].style.display = 'none';
+
+let isAddressPrefilled = false;
+let prefilledCustomerData = {
+	email: '',
+	phone: '',
+	shippingAddress: ''
+};
+window.onload = async () => {
+	gk_checkout_enhancer_cart = await fetchGkCart();
+	gkCart = gk_checkout_enhancer_cart;
+	if (gkABTestingEnabled === "true") {
+		getUserExperiments();
+	}
+	observeCartChanges();
+	const closeButtonArr = [...document.getElementsByClassName('gk-close')];
+	if(closeButtonArr.length){
+		closeButtonArr[0].remove();
+	}
+};
+window.onpageshow = (event) => {
+	if (event.persisted) {
+		gkIframe.src = `${LOGIN_IFRAME_HOST}`;
+		closeGkModal(false)
+	}
+}
+window.addEventListener('unload', function(event) {
+    if (redirectingToCheckoutFlag) {
+		closeGkModal();
+	}
+});
+
+const analyticsEvent = (payload, requestId) => {
+	const timestamp = Date.now();
+	const userAgent = navigator.userAgent;
+	const version = '1';
+
+	const data = {
+		...payload,
+		timestamp,
+		requestId: requestId || 'NA',
+		userAgent,
+		version
+	};
+	fetch(HITS_HOST + '/api/v1/events', {
+		method: 'POST',
+		headers: {
+			Accept: 'application/json',
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(data)
+	});
+};
+async function initiateLogin() {
+
+	// if(window.gkCustomerEmail){
+	//   fetch(`https://${window.gkShopDomain}/account/logout`, {
+	//     method: 'GET',
+	//     headers: {
+	//       'Content-Type': 'application/json',
+	//     }
+	//   }).then(response => {
+	//       response.text();
+	//   }).then(data => {
+	//       console.log('Logout API response', data);
+	//   }).catch(error => {
+	//       console.error('Error during logout API', error);
+	//   });
+	// }
+
+	// if (isAddressPrefilled) {
+	// 	gkIframe.contentWindow.postMessage(
+	// 		{ type: 'address-prefilled-event', customerData: prefilledCustomerData },
+	// 		LOGIN_IFRAME_HOST
+	// 	);
+	// 	window.addEventListener('message', (event) => {
+	// 		if (event.data.type === 'address-prefilled-redirect-to-checkout') {
+
+	// 			window.location.href = '/checkout';
+	// 		}
+	// 	});
+	// 	return;
+	// }
+
+	//   if (!cart?.items || cart?.items?.length === 0) {
+	gkCart = await fetchGkCart();
+	//   }
+	if (gkCart?.items.length === 0) {
+		return;
+	}
+  gkCart.attributes.shopify_session_id = window.gkShopifySessionId;
+  const discountCode = getGkDiscountCode();
+	if (!gkCart?.token) return;
+	gkCart.token = gkCart.token.split('?key=')[0]
+  const body = {
+    // shopifySessionId: window.gkShopifySessionId || '',
+    merchantDomain: window.location.origin,
+    mid: window.gkMerchantId,
+	  cart: gkCart
+  };
+	setLocalStorage(KWIK_SIGNED_IN, undefined);
+	const response = await fetch(API_URL + '/v3/login/request', {
+    method: 'POST',
+    headers: {
+      Accept: 'application.json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  })
+	const res = await response.json()
+	const requestId = res.data.requestId;
+	let url = API_URL +
+		'/sa-login-ui/gk_sa_login.html?reqId=' +
+		requestId;
+	const kp_email = localStorage.getItem('kp_email');
+	if (kp_email) {
+		url = url + '&kpe=' + kp_email;
+	}
+
+	if (discountCode) {
+		url = url + '&cd=' + discountCode;
+	}
+	if (isAddressPrefilled) {
+		url = url + '&iap=' + isAddressPrefilled;
+	}
+
+	gkIframe.contentWindow.postMessage(
+		{
+			type: 'utm_params',
+			orig_referrer: document.referrer,
+			mkt_source: sessionStorage.getItem('gkMktSource'),
+			mkt_campaign: sessionStorage.getItem('gkMktCampaign'),
+			mkt_medium: sessionStorage.getItem('gkMktMedium'),
+			source: sessionStorage.getItem('gkSource'),
+			landing_page: sessionStorage.getItem('gkLandingPage')
+		},
+		LOGIN_IFRAME_HOST
+	);
+
+	gkIframe.contentWindow.postMessage(
+		{
+			type: 'merchant_url',
+			url: window.location.href
+		},
+		LOGIN_IFRAME_HOST
+	);
+	//updating cart requestid and attributes
+	// gkCart.attributes.shopify_session_id = window.gkShopifySessionId;
+	gkCart.attributes.request_id = requestId;
+	gkCart.attributes.shopify_customer = window.gkCustomerEmail;
+
+	gkModal.style.display = 'block';
+	document.body.style.overflow = 'hidden';
+	document.getElementsByClassName('loader-content')[0].style.display = 'none';
+	document.getElementsByClassName('gk-otp-popup')[0].style.display = 'block';
+	gkIframe.contentWindow.postMessage({ type: 'popup-display-change', gkModalDisplay: "block" }, LOGIN_IFRAME_HOST);
+
+	const token = getGkCookiefn(KWIK_SESSION_TOKEN_KEY);
+	gkIframe.contentWindow.postMessage(
+		{
+			domain: window.gkShopDomain,
+			email: window.gkCustomerEmail,
+			cart: gkCart,
+			token,
+			shopifySessionId: window.gkShopifySessionId,
+			discountCode: getGkDiscountCode(),
+			kwikPassEmail,
+			source: adSource,
+			requestId
+		},
+		LOGIN_IFRAME_HOST
+	);
+
+	analyticsEvent({
+		adSource,
+		eventType: 'onGkClick',
+		merchantId: window.gkMerchantId,
+		name: 'gokwik-button-clicked',
+		type: 'event',
+		shopifySessionId: window.gkShopifySessionId
+	});
+	if (window.location.origin.includes('babyforest') || window?.gkShopDomain?.includes('wellbeing') || window?.gkShopDomain?.includes('house-ofchikankari')) {
+	setTimeout(() => {
+		window.gk_utm_message_data = {
+			type: 'utm_params',
+			orig_referrer: document.referrer,
+			mkt_source: sessionStorage.getItem('gkMktSource'),
+			mkt_campaign: sessionStorage.getItem('gkMktCampaign'),
+			mkt_medium: sessionStorage.getItem('gkMktMedium'),
+			source: sessionStorage.getItem('gkSource'),
+			landing_page: sessionStorage.getItem('gkLandingPage')
+		};
+		gkIframe.contentWindow.postMessage(
+			{
+				type: 'utm_params',
+				orig_referrer: document.referrer,
+				mkt_source: sessionStorage.getItem('gkMktSource'),
+				mkt_campaign: sessionStorage.getItem('gkMktCampaign'),
+				mkt_medium: sessionStorage.getItem('gkMktMedium'),
+				source: sessionStorage.getItem('gkSource'),
+				landing_page: sessionStorage.getItem('gkLandingPage')
+			},
+			LOGIN_IFRAME_HOST
+		);
+		window.gk_url_message_data = {
+			type: 'merchant_url',
+			url: window.location.href
+		}
+		gkIframe.contentWindow.postMessage(
+			{
+				type: 'merchant_url',
+				url: window.location.href
+			},
+			LOGIN_IFRAME_HOST
+		);
+		window.gk_login_message_data = {
+			domain: window.gkShopDomain,
+			email: window.gkCustomerEmail,
+			cart: gkCart,
+			token,
+			shopifySessionId: window.gkShopifySessionId,
+			discountCode: getGkDiscountCode(),
+			kwikPassEmail,
+			source: adSource,
+			requestId
+		}
+		gkIframe.contentWindow.postMessage(
+			{
+				domain: window.gkShopDomain,
+				email: window.gkCustomerEmail,
+				cart: gkCart,
+				token,
+				shopifySessionId: window.gkShopifySessionId,
+				discountCode: getGkDiscountCode(),
+				kwikPassEmail,
+				source: adSource,
+				requestId
+			},
+			LOGIN_IFRAME_HOST
+		);
+	}, 800);
+	}
+	// document.getElementsByClassName("loader-content")[0].style.display = 'block';
+}
+
+const initiateLogout = async () => {
+	// setGkCookieFn(KWIK_SESSION_TOKEN_KEY, undefined);
+	setLocalStorage(KWIK_SIGNED_IN, undefined);
+	gkIframe.contentWindow.postMessage({ type: 'initiateLogout' }, LOGIN_IFRAME_HOST);
+};
+
+if (window.addEventListener) {
+	window.addEventListener('message', onMessage, false);
+}
+
+async function onMessage(event) {
+
+	const data = event.data;
+	if (event.data.func == 'redirectToCheckout') {
+		window[data.func].call(null, data.message);
+	} else if (event.data.func == 'showLoginPopup') {
+		document.getElementsByClassName('loader-content')[0].style.display = 'none';
+		document.getElementsByClassName('gk-otp-popup')[0].style.display = 'block';
+	} else if (event.data.func == 'iframeLoaded') {
+		if (!window.gkCustomerEmail && getLocalStorage(KWIK_SIGNED_IN)) {
+			console.log('initiateLogout inside if');
+			// initiateLogout();
+		}
+	} else if (event.data.func == 'foreignAnalytics') {
+		initAnalyticsListener(event);
+	} else if (event.data.func === 'autoReadOtp') {
+		autoReadOtp();
+	} else if (event.data.func === 'guest-checkout') {
+		const discountCode = getGkDiscountCode();
+		window.open(`/checkout?${discountCode ? 'discount=' + discountCode + '&' : ''}${data?.phoneNumber?`checkout[shipping_address][phone]=${isTenDigitPhoneFormat ? "" : "%2b91"}${data?.phoneNumber}`:''}`, '_self');
+		if (event.data.skipCheckoutNoToken && event.data.mId !== '19g6jls1kg1ew') {
+			closeGkModal();
+		}
+	} else if (event.data.func === 'update-cart-req-id') {
+		requestId = event.data.request_id;
+		isTenDigitPhoneFormat = event.data?.isTenDigitPhoneFormat;
+		updateGkCart(event.data.request_id, window.gkShopifySessionId, window.gkCustomerEmail);
+	} else if (event.data.func === 'showTruecallerPopup') {
+		const trueCallerRequestId = await checkTrueCallerApp(event?.data?.message?.requestId);
+		console.log();
+		if (trueCallerRequestId) {
+			gkIframe.contentWindow.postMessage(
+				{ type: 'trueCallerVerification', trueCallerRequestId },
+				LOGIN_IFRAME_HOST
+			);
+			analyticsEvent(
+				{
+					cartId: currentCartGk?.token,
+					merchantId: window.gkMerchantId,
+					requestId: event?.data?.message?.requestId,
+					shopifySessionId: window.gkShopifySessionId,
+					eventType: 'click',
+					name: 'trueCallerVerify',
+					type: 'function'
+				},
+				event?.data?.message?.requestId
+			);
+		}
+	} else if (event.data.func === 'closeGkModal') {
+		closeGkModal();
+	} else if (event.data.func === 'set_gk_storage') {
+        let cookieData = event?.data?.data?.cookie || null;
+        let localStorageData = event?.data?.data?.localStorage;
+        if (cookieData) {
+          setGkCookieFn(cookieData.name, cookieData.value, cookieData.expiry);
+        }
+        if (localStorageData) {
+          setLocalStorage(localStorageData.name, localStorageData.value);
+        }
+      }
+}
+
+const closeGkModal = async (fireEvent = true) => {
+	document.body.style.overflow = 'auto';
+	gkModal.style.display = 'none';
+	// gkIframe.src = '';
+	gkIframe.contentWindow.postMessage({ type: 'close-login-window', gkModalDisplay: "none" }, LOGIN_IFRAME_HOST);
+	if (fireEvent) {
+		analyticsEvent(
+		{
+			cartId: currentCartGk?.token,
+			merchantId: window.gkMerchantId,
+			requestId: requestId,
+			shopifySessionId: window.gkShopifySessionId,
+			eventType: 'click',
+			name: 'back_button_clicked',
+			type: 'function',
+			data: { pageNo: '1' }
+		},
+		requestId
+	);
+	}
+}
+
+async function fetchGkCart() {
+	return new Promise((resolve, reject) => {
+		fetch(`/cart.js`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+			.then((response) => response.json())
+			.then((result) => {
+				resolve(result);
+			});
+	});
+}
+
+async function updateGkCart(requestId, shopifySessionId, shopifyCustomer, gKexpCustomerId, merchantId, variantName) {
+	return new Promise((resolve, reject) => {
+		fetch('/cart/update.js', {
+			method: 'POST',
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+				'Content-Type': 'application/json;'
+			},
+			body: JSON.stringify({
+				attributes: {
+					requestId,
+					shopifySessionId,
+					shopifyCustomer,
+					expCustomerId: gKexpCustomerId,
+					merchantId,
+					variantName,
+				}
+			})
+		}).then((response) => resolve());
+	});
+}
+
+async function redirectToCheckout(data) {
+	const discountCode = getGkDiscountCode();
+
+	if (data?.token) {
+		setLocalStorage(KWIK_SIGNED_IN, true);
+		setGkCookieFn(KWIK_SESSION_TOKEN_KEY, data?.token);
+	}
+
+	if (data?.email && data?.password) {
+		fetch(
+			`https://${window.gkShopDomain}/account/login?customer[email]=${data.email}&customer[password]=${data.password}`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}
+		)
+			.then((response) => response.text())
+			.then((result) => {
+				if (result.includes('Log out')) {
+					redirectingToCheckoutFlag = true;
+					window.location.href = `https://${window.gkShopDomain}/checkout?${
+						discountCode ? 'discount=' + discountCode + '&' : ''
+					}checkout[shipping_address][phone]=${isTenDigitPhoneFormat ? "" : "%2b91"}${data?.phone}`;
+				} else {
+					// password not matched
+					gkIframe.contentWindow.postMessage(
+						{
+							domain: window.gkShopDomain,
+							email: window.gkCustomerEmail,
+							cart: gkCart,
+							reGenerateLogin: true
+						},
+						'*'
+					);
+				}
+			})
+			.catch((error) => {
+				// error occured while login
+				console.log('error', error);
+			});
+	} else if (data?.multipass) {
+		if (window.gkCustomerEmail) {
+			redirectingToCheckoutFlag = true;
+			window.location.href = `/checkout?${discountCode ? 'discount=' + discountCode + '&' : ''}`;
+		} else {
+			const multipassParams = data?.multipass?.split('/account')[1];
+			const fetchurl = window.location.origin + '/account' + multipassParams;
+
+			fetch(fetchurl, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}).finally(() => {
+				redirectingToCheckoutFlag = true;
+				window.location.href = `/checkout?${discountCode ? 'discount=' + discountCode + '&' : ''}`;
+			});
+		}
+	} else if (data?.cartParamCheckoutLink) {
+		const urlParams = new URLSearchParams(data?.cartParamCheckoutLink);
+		const conditions = [
+			"checkout[shipping_address][address1]",
+			"checkout[shipping_address][first_name]",
+			"checkout[shipping_address][province]",
+			"checkout[shipping_address][city]",
+			"checkout[shipping_address][phone]",
+			"checkout[shipping_address][zip]"
+		  ];
+		  const isAddressPresent = conditions.some(param => urlParams.has(param));
+		  if(isAddressPresent) {
+			const requestId = data.requestId
+			analyticsEvent({
+				eventType: 'onLoad',
+				merchantId: window.gkMerchantId,
+				name: 'addressPrefill',
+				type: 'event',
+				shopifySessionId: window.gkShopifySessionId
+			}, requestId);
+		  }
+		const modifiedLink = data.cartParamCheckoutLink?.replace(
+			/(\/checkout\?)/,
+			`$1${discountCode ? 'discount=' + discountCode + '&' : ''}`
+		);
+		redirectingToCheckoutFlag = true;
+		window.location.href = modifiedLink;
+	} else if (data?.userType == 'new') {
+		redirectingToCheckoutFlag = true;
+		window.location = `https://${window.gkShopDomain}/checkout?${
+			discountCode ? 'discount=' + discountCode + '&' : ''
+		}checkout[shipping_address][phone]=${isTenDigitPhoneFormat ? "" : "%2b91"}${data?.phone}${
+			data.email ? '&checkout[email]=' + data?.email : ''
+		}`;
+	}
+}
+
+function getGkDiscountCode() {
+	let cookie = {};
+	document.cookie.split(';').forEach(function (el) {
+		let [key, value] = el.split('=');
+		cookie[key.trim()] = value;
+	});
+	const discountCode =
+		cookie['discount_code'] || cookie['coupon_applied'] || cookie['applied-coupons'];
+	return discountCode;
+}
+
+function setLocalStorage(key, value) {
+	if (typeof localStorage !== 'undefined') {
+		localStorage.setItem(key, value);
+	}
+}
+
+function getLocalStorage(key) {
+	if (typeof localStorage !== 'undefined') {
+		const value = localStorage.getItem(key);
+		return value ? value : null;
+	}
+	return null;
+}
+
+/*
+  Foreign Analytics
+*/
+const initAnalyticsListener = async (event) => {
+	const cart = gk_checkout_enhancer_cart;
+	// if (event.origin.includes('gokwik')) { // change condition to match exact iframe domain path for security
+	callAnalyticsService(event.data?.service, event?.data?.eventName, { ...event.data.data, cart });
+	// }
+};
+
+const callAnalyticsService = (service, eventName, data) => {
+	switch (service) {
+		case 'contlo':
+			fireContloEvent(eventName, data);
+			break;
+		case 'fb':
+			fireFbEvent(eventName, data);
+			break;
+		case 'ga4':
+			fireGa4Event(eventName, data);
+			break;
+		case 'webEngage':
+			firewebEngageEvent(eventName, data);
+			break;
+		case 'moengage':
+			fireMoenageEvent(eventName, data)
+		default:
+			break;
+	}
+};
+
+
+const fireMoenageEvent = (eventName, data) => {
+	let merchantUrl = window.location.origin
+	if (merchantUrl.includes('simpleskin')) {
+		if(eventName === 'OTP_login') {
+			moengageOtpLoginEvent(eventName, data)
+			console.log('Moengage OTP_Login event')
+		}
+	}
+   
+}
+
+const moengageOtpLoginEvent = (eventName, data) => {
+  	let eventDetails = {
+ 		'Mobile Number': parseInt(data.mobileNumber),
+		'Gokwik First Time User': data.firstTimeUser,
+		Channel: 'Gokwik'
+	};
+	if(gkMktSource !== null) {
+		eventDetails.UTM_Source = gkMktSource
+	}
+	if(gkMktCampaign !== null) {
+		eventDetails.UTM_Medium = gkMktCampaign
+	}
+	if(gkMktMedium !== null) {
+		eventDetails.UTM_Medium = gkMktMedium
+	}
+	try {
+		console.log('MOENGAGE GK');
+		Moengage.track_event(eventName, eventDetails);
+		console.log('MOENGAGE OTP EVENT');
+	} catch (e) {
+		const otpVerifiedResposne = data.response;
+		if (otpVerifiedResposne.data?.multipass) {
+			redirectToCheckout({ multipass: otpVerifiedResposne.data.multipass, requestId: otpVerifiedResposne.requestId, token: otpVerifiedResposne.data.token, });
+		} else if (otpVerifiedResposne.data?.cartParamCheckoutLink) {
+			redirectToCheckout({ cartParamCheckoutLink: otpVerifiedResposne.data.cartParamCheckoutLink, requestId: otpVerifiedResposne.requestId, token: otpVerifiedResposne.data.token, });
+		} else if (otpVerifiedResposne.data?.email && otpVerifiedResposne.data?.password) {
+			redirectToCheckout({ email: otpVerifiedResposne.data?.email, password: otpVerifiedResposne.data?.password, otpVerifiedResposne, token: otpVerifiedResposne.data.token });
+		} else if (otpVerifiedResposne.data?.userType == 'new') {
+			redirectToCheckout({ userType: otpVerifiedResposne.data?.userType, requestId: otpVerifiedResposne.requestId, token: otpVerifiedResposne.data.token, phone: otpVerifiedResposne.mobileNumber });
+		}
+	}
+	const otpVerifiedResposne = data.response;
+	if (otpVerifiedResposne.data?.multipass) {
+		redirectToCheckout({ multipass: otpVerifiedResposne.data.multipass, requestId: otpVerifiedResposne.requestId, token: otpVerifiedResposne.data.token, });
+	} else if (otpVerifiedResposne.data?.cartParamCheckoutLink) {
+		redirectToCheckout({ cartParamCheckoutLink: otpVerifiedResposne.data.cartParamCheckoutLink, requestId: data.requestId, token: otpVerifiedResposne.data.token, });
+	} else if (otpVerifiedResposne.data?.email && otpVerifiedResposne.data?.password) {
+		redirectToCheckout({ email: otpVerifiedResposne.data?.email, password: otpVerifiedResposne.data?.password, otpVerifiedResposne, token: otpVerifiedResposne.data.token });
+	} else if (otpVerifiedResposne.data?.userType == 'new') {
+		redirectToCheckout({ userType: otpVerifiedResposne.data?.userType, requestId: otpVerifiedResposne.requestId, token: otpVerifiedResposne.data.token, phone: data.mobileNumber });
+	}
+	console.log('REDIRECTION EVENT');
+
+ };
+
+/*
+  WebEngage Events
+*/
+const firewebEngageEvent = (eventName, data) => {
+	if (eventName === 'phone_number_entered' && data?.webengageLoginType == 'phone') {
+		webengagePhoneNumberEntered(data);
+	} else if (eventName === 'otp-verified-gk' && data?.webengageLoginType == 'phone') {
+		webengageOtpVerifiedEvent(data);
+	}
+};
+
+const webengagePhoneNumberEntered = (data) => {
+	let gkDataObj = {
+		mobile_number: data.phoneNumber,
+		currency: 'INR',
+		tag: 'GoKwik',
+		cart_total_price: (parseInt(data?.cart?.original_total_price) / 100).toFixed(2),
+		items: createItemsBody(data.cart)
+	};
+	webengage.track('Mobile_Added_GK', gkDataObj);
+};
+
+const webengageOtpVerifiedEvent = (data) => {
+	let gkDataObj = {
+		mobile_number: data.phoneNumber,
+		currency: 'INR',
+		tag: 'GoKwik',
+		cart_total_price: (parseInt(data?.cart?.original_total_price) / 100).toFixed(2),
+		items: createItemsBody(data.cart)
+	};
+	webengage.track('OTP_Verified_GK', gkDataObj);
+};
+
+/*
+  Google Analytics 4
+*/
+const fireGa4Event = (eventName, data) => {
+	if (eventName === 'phone_number_entered') {
+		ga4MobileNumberEntered(data);
+	} else if (eventName === 'otp-verified-gk') {
+		ga4OtpVerifiedEvent(data);
+	}
+};
+
+const ga4MobileNumberEntered = (data) => {
+	let gkDataObj = {
+		mobile_number: data.phoneNumber,
+		currency: 'INR',
+		tag: 'GoKwik',
+		cart_total_price: (parseInt(data?.cart?.original_total_price) / 100).toFixed(2),
+		items: createItemsBody(data.cart)
+	};
+	window.gtag('event', 'Mobile_Added_GK', gkDataObj);
+};
+
+const ga4OtpVerifiedEvent = (data) => {
+	let gkDataObj = {
+		mobile_number: data.phoneNumber,
+		currency: 'INR',
+		tag: 'GoKwik',
+		cart_total_price: (parseInt(data?.cart?.original_total_price) / 100).toFixed(2),
+		items: createItemsBody(data.cart)
+	};
+	window.gtag('event', 'OTP_Verified_GK', gkDataObj);
+};
+
+const createItemsBody = (cart) => {
+	const items = cart.items;
+	return items.map((item) => {
+		let itemEventPayload = {
+			product_id: item.product_id || 'NA',
+			product_variant_id: item.variant_id,
+			product_name: item.title,
+			product_variant: item.variant_title || 'NA',
+			product_quantity: item.quantity,
+			product_url: item.url,
+			product_image_url: item.image,
+			product_price: +item.final_price / 100,
+			coupon: item?.discounts[0]?.title || 'NA'
+		};
+
+		return itemEventPayload;
+	});
+};
+
+/*
+  FB Pixel
+*/
+
+const fireFbEvent = (eventName, data) => {
+	if (eventName === 'init-checkout') {
+		initCheckout(data);
+	}
+};
+
+const initCheckout = (data) => {
+	// Keeping this console to make sure that pixels are working fine
+	console.log(
+		'Fb Pixel==>',
+		'track',
+		'beginCheckout',
+		{
+			currency: 'INR',
+			tag: 'GoKwik',
+			cart_total_price: (parseInt(data?.cart?.original_total_price) / 100).toFixed(2),
+			items: data.cart?.items?.map((item) => {
+				return {
+					product_id: item.product_id || 'NA',
+					product_variant_id: item.variant_id,
+					product_name: item.title,
+					product_variant: item.variant_title || 'NA',
+					product_quantity: item.quantity,
+					product_url: item.url,
+					product_image_url: item.image,
+					product_price: +item.final_price / 100,
+					coupon: item?.discounts[0]?.title || 'NA'
+				};
+			})
+		},
+		{ eventID: `Gokwik ${Math.random()}` }
+	);
+	fbq(
+		'track',
+		'beginCheckout',
+		{
+			currency: 'INR',
+			tag: 'GoKwik',
+			cart_total_price: (parseInt(data?.cart?.original_total_price) / 100).toFixed(2),
+			items: data.cart?.items?.map((item) => {
+				return {
+					product_id: item.product_id || 'NA',
+					product_variant_id: item.variant_id,
+					product_name: item.title,
+					product_variant: item.variant_title || 'NA',
+					product_quantity: item.quantity,
+					product_url: item.url,
+					product_image_url: item.image,
+					product_price: +item.final_price / 100,
+					coupon: item?.discounts[0]?.title || 'NA'
+				};
+			})
+		},
+		{ eventID: `Gokwik ${Math.random()}` }
+	);
+};
+
+/*
+  Contlo Analytics
+*/
+const fireContloEvent = (eventName, data) => {
+	if (eventName === 'phone_number_entered') {
+		phoneNumberEnteredEvent(data);
+	}
+};
+
+const phoneNumberEnteredEvent = (data) => {
+	let dataObj = {
+		eventName: 'mobile_added_gk',
+		data: createBody(data)
+	};
+
+	window.contlo?.sendEvent(dataObj.eventName, dataObj?.data?.phoneNumber, dataObj.data);
+};
+
+const createBody = (data) => {
+	let productIds = [];
+	data?.cart?.items?.map((product) => {
+		productIds = [...productIds, `${product.id}`];
+	});
+	return {
+		tag: 'GoKwik',
+		cart_total_price: data?.cart?.original_total_price,
+		product_id: productIds || [],
+		first_name: '',
+		last_name: '',
+		email: '',
+		full_address: '',
+		city: '',
+		state: '',
+		address_type: '',
+		shipping_method: '',
+		abc_url: '',
+		pincode: '',
+		...data
+	};
+};
+
+/*
+  OTP Auto Read
+*/
+const autoReadOtp = async () => {
+	if ('OTPCredential' in window) {
+		analyticsEvent(
+			{
+				cartId: currentCartGk?.token,
+				merchantId: window.gkMerchantId,
+				requestId: requestId,
+				shopifySessionId: window.gkShopifySessionId,
+				eventType: 'click',
+				name: 'auto_read_otp_shown',
+				type: 'function',
+				data: { page: '2' }
+			},
+			requestId
+		);
+		const signal = new AbortController();
+		let o = {
+			otp: { transport: ['sms'] },
+			signal: signal.signal
+		};
+		navigator.credentials
+			.get(o)
+			.then((res) => {
+				let body = { type: 'prefillOtp', data: res.code };
+				dispatchIframeEvent(body);
+				signal.abort();
+			})
+			.catch((e) => {
+				signal.abort();
+			});
+	}
+};
+
+const dispatchIframeEvent = (body) => {
+	gkIframe.contentWindow.postMessage(body, '*');
+};
+
+/*
+Truecaller Verification
+*/
+const checkTrueCallerApp = async (requestId) => {
+	return new Promise((resolve) => {
+		const trueCallerRequestId = 'trc-' + requestId;
+		window.location.href = `truecallersdk://truesdk/web_verify?type=btmsheet&requestNonce=${trueCallerRequestId}&partnerKey=${TRUECALLER_PARTNER_KEY}&partnerName=Gokwik&lang=en&skipOption=useanothernum&ctaPrefix=continuewith&btnShape=rect&ctaColor=%23000000"`;
+		setTimeout(() => {
+			if (document.hasFocus()) {
+				resolve(null);
+			} else {
+				resolve(trueCallerRequestId);
+			}
+		}, 600);
+	});
+};
+
+//listening to cart changes
+function emitCartChanges() {
+	if (window.location.pathname.includes('/cart')) {
+		fetch('/cart.js')
+			.then((res) => {
+				res
+					.json()
+					.then((cart) => {
+						gk_checkout_enhancer_cart = cart;
+					})
+					.catch((err) => console.log(err));
+			})
+			.catch((err) => console.log(err));
+	}
+}
+
+function observeCartChanges() {
+	const cartObserver = new PerformanceObserver((list) => {
+		list.getEntries().forEach((entry) => {
+			const isValidRequestType = ['xmlhttprequest', 'fetch'].includes(entry.initiatorType);
+			const isCartChangeRequest = /\/cart\//.test(entry.name);
+			if (isValidRequestType && isCartChangeRequest) {
+				emitCartChanges();
+			}
+		});
+	});
+	cartObserver.observe({ entryTypes: ['resource'] });
+}
+
+/*
+Helper functions
+*/
+function setGkCookieFn(cname, cvalue, exdays) {
+	const d = new Date();
+	d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+	let expires = 'expires=' + d.toUTCString();
+	document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/';
+}
+
+function getGkCookiefn(cname) {
+	let name = cname + '=';
+	let decodedCookie = document.cookie;
+	let ca = decodedCookie.split(';');
+	for (let i = 0; i < ca.length; i++) {
+		let c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+	}
+	return '';
+}

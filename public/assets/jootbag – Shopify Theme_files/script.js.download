@@ -1,0 +1,7 @@
+jQuery(document).ready(function($) {
+
+	$('.elementor-button-link, .hfe-menu-item').each(function () {
+        $(this).attr('target', '_blank');
+    });
+
+});

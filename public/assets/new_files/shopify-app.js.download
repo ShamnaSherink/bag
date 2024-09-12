@@ -1,0 +1,29 @@
+// Create link element
+var sellerUuid= document.currentScript.src
+  .split("?")[1]
+  .split("&")
+  .reduce(
+    (obj, pair) => ((obj[pair.split("=")[0]] = pair.split("=")[1]), obj),
+    {}
+  )["uuid"];
+
+var sellerPreviewRequest = document.currentScript.src
+  .split("?")[1]
+  .split("&")
+  .reduce(
+    (obj, pair) => ((obj[pair.split("=")[0]] = pair.split("=")[1]), obj),
+    {}
+  )["preview"];
+    const promiseLinkElement = document.createElement('link');
+    promiseLinkElement.rel = 'stylesheet';
+    promiseLinkElement.href = 'https://sr-promise-prod.s3.ap-south-1.amazonaws.com/sr-promise/static/instant-widget.css';
+    
+    // Create script element
+    const promiseScriptElement = document.createElement('script');
+    promiseScriptElement.src = `https://sr-promise-prod.s3.ap-south-1.amazonaws.com/sr-promise/static/app-instant-widget.js?uuid=${sellerUuid}&preview=${sellerPreviewRequest}`
+    promiseScriptElement.defer = true; // Add the defer attribute
+    
+    // Append link and script elements to the head of the document
+    document.head.appendChild(promiseLinkElement);
+    document.head.appendChild(promiseScriptElement);
+  

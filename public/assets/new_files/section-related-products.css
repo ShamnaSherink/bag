@@ -1,0 +1,6 @@
+.related-products {
+  display: block;
+}
+.related-products-main-section .product-hover > button{
+  display: none;
+}

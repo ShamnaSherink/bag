@@ -1,0 +1,30 @@
+(function ($) {
+
+  const wdtPasswordWidgetHandler = function($scope, $) {
+
+    $scope.find('.login_form_submit').on('click', function (event) {
+
+        event.preventDefault();
+
+        let preview_url = $(this).parents('.login_form_wrapper').find('.preview_url').val();
+        let id = (new Date()).getTime();
+
+        var demoWindow = window.open(window.location.href, id, 'popup=0,location=1');
+        demoWindow.document.write($(this).parents('.login_form_wrapper').html());
+        demoWindow.document.write('<script> let element = document.getElementsByClassName("login_form_submit"); element[0].style.display = "none"; if(element[1]) { element[1].style.display = "none"; } document.getElementsByClassName("login_form")[0].submit(); </script>');
+
+        setTimeout( function() {
+            demoWindow.location.href = preview_url;
+        }, 300 );
+
+    });
+
+
+  };
+
+
+  $(window).on('elementor/frontend/init', function () {
+		elementorFrontend.hooks.addAction('frontend/element_ready/wdt-password.default', wdtPasswordWidgetHandler);
+  });
+
+})(jQuery);

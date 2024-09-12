@@ -1,0 +1,17 @@
+/*!
+Theme Name: Shopify
+Theme URI: https://shopifydemos.wpengine.com/
+Author: Designthemes
+Author URI: https://shopifydemos.wpengine.com/
+Description: Shopify Demos
+Version: 1.0.0
+Tags: custom-background, custom-logo, custom-menu, featured-images, threaded-comments, translation-ready
+*/
+
+body {
+    background: none;
+    margin: 0;
+    padding: 0;
+}
+
+button { cursor: pointer; }
