@@ -129,6 +129,9 @@ export default function Home() {
           </Card>
         </Col>
 
+
+
+
         <Col xs={12} md={4} className="mb-4">
           <Card className="text-center">
             <Card.Img variant="top" src="./assets/shop-30.webp" />
