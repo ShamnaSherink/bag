@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import './registration.css'
-
+import axios from 'axios'
 
 export default function Registration() {
     const [input, setInput] = useState({
@@ -13,39 +13,49 @@ export default function Registration() {
     console.log(input)
 
 
-    const [errorMessage,setErrorMessage]=useState({})
+    const [errorMessage, setErrorMessage] = useState({})
 
-    const validate = ()=>{
-        
+    const validate = () => {
+
         console.log('event');
         const error = {} //object
-        if(input.name==''){
+        if (input.name == '') {
             error.name = 'Enter your name'
         }
-        if(input.email==''){
-            error.email='Enter your email'
+        if (input.email == '') {
+            error.email = 'Enter your email'
         }
-        if(input.password==''){
-            error.password='Enter your password'
+        if (input.password == '') {
+            error.password = 'Enter your password'
         }
-        if(input.number==''){
-            error.number='Enter your number'
+        if (input.number == '') {
+            error.number = 'Enter your number'
         }
-        if(input.address==''){
-            error.address='Enter your address'
+        if (input.address == '') {
+            error.address = 'Enter your address'
         }
         setErrorMessage(error)
-        return Object.keys(error).length==0
+        return Object.keys(error).length == 0
 
     }
 
-    const submit=(event)=>{
+    const submit = (event) => {
+        // event.preventDefault()
         if (!validate()) {
             return console.log('error');
-            
+
         }
+        axios.post('http://127.0.0.1:8000/registration/', input).then((response) => {
+            console.log('response==>',response);
+
+        }).catch((error) => {
+            console.log('error==>',error);
+
+        })
+
+
         console.log('hello');
-        
+
 
 
     }
@@ -67,34 +77,34 @@ export default function Registration() {
         <div>
 
             <div className='registercontainer'>
-                <div class="container">
+                <div class="container1">
 
-                    <h2>Register</h2>
+                    <h2 style={{textAlign:'center'}}>Register</h2>
 
                     <div class="form-group">
-                        <label for="username" style={{color:errorMessage?.name?'red':''}}>Name</label>
-                        <input  style={{borderColor:errorMessage?.name?'red':''}} type="text" id="name" onClick={()=>{setErrorMessage({...errorMessage,name:''})}} onChange={inputChange}name="name" required />
+                        <label for="username" style={{ color: errorMessage?.name ? 'red' : '' }}>Name</label>
+                        <input style={{ borderColor: errorMessage?.name ? 'red' : '' }} type="text" id="name" onClick={() => { setErrorMessage({ ...errorMessage, name: '' }) }} onChange={inputChange} name="name" required />
                     </div>
                     <div class="form-group">
-                        <label for="email"style={{color:errorMessage?.email?'red':''}}>Email:</label>
-                        <input style={{borderColor:errorMessage?.email?'red':''}} type="text" id="email" onClick={()=>{setErrorMessage ({...errorMessage,email:''})}}  onChange={inputChange} name="email" required /><br></br>
-                    </div>
-
-
-                    <div class="form-group">
-                        <label style={{color:errorMessage?.password?'red':''}} for="password">Password:</label>
-                        <input style={{borderColor:errorMessage?.password?'red':''}}  type="text" id="password" onClick={()=>{setErrorMessage({...errorMessage,password:''})}} onChange={inputChange} name="password" required />
-                    </div>
-
-                    <div class="form-group">
-                        <label style={{color:errorMessage?.number?'red':''}} for="number">Number:</label>
-                        <input style={{borderColor:errorMessage?.number?'red':''}} type="text" id="number" onClick={()=>{setErrorMessage({...errorMessage,number:''})}} onChange={inputChange} name="number" required />
+                        <label for="email" style={{ color: errorMessage?.email ? 'red' : '' }}>Email:</label>
+                        <input style={{ borderColor: errorMessage?.email ? 'red' : '' }} type="text" id="email" onClick={() => { setErrorMessage({ ...errorMessage, email: '' }) }} onChange={inputChange} name="email" required /><br></br>
                     </div>
 
 
                     <div class="form-group">
-                        <label style={{color:errorMessage?.address?'red':''}} for="number">Address:</label>
-                        <input style={{borderColor:errorMessage?.address?'red':''}} type="text" id="address" onClick={()=>{setErrorMessage ({...errorMessage,address:''})}} onChange={inputChange} name="address" required />
+                        <label style={{ color: errorMessage?.password ? 'red' : '' }} for="password">Password:</label>
+                        <input style={{ borderColor: errorMessage?.password ? 'red' : '' }} type="text" id="password" onClick={() => { setErrorMessage({ ...errorMessage, password: '' }) }} onChange={inputChange} name="password" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label style={{ color: errorMessage?.number ? 'red' : '' }} for="number">Number:</label>
+                        <input style={{ borderColor: errorMessage?.number ? 'red' : '' }} type="text" id="number" onClick={() => { setErrorMessage({ ...errorMessage, number: '' }) }} onChange={inputChange} name="number" required />
+                    </div>
+
+
+                    <div class="form-group">
+                        <label style={{ color: errorMessage?.address ? 'red' : '' }} for="number">Address:</label>
+                        <input style={{ borderColor: errorMessage?.address ? 'red' : '' }} type="text" id="address" onClick={() => { setErrorMessage({ ...errorMessage, address: '' }) }} onChange={inputChange} name="address" required />
                     </div>
 
                     <div class="form-group">
