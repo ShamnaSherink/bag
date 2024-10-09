@@ -13,6 +13,7 @@ import Footer from './components/Footer';
 import Shopregistration from './components/Shopregistration';
 import Cartbag from './components/Cartbag';
 import Wishlist from './components/Wishlist';
+import Payment from './pages/Payment';
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
           <Route path='/shopregistration' element={<Shopregistration/>}/>
           <Route path='/cart'element={<Cartbag/>}/>
           <Route path='/wishlist'element={<Wishlist/>}/>
+          <Route path='/payment'element={<Payment/>}/>
           
           
 

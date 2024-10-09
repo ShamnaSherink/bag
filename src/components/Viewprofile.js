@@ -1,15 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import './viewprofile.css'
 import { Container, Row, Col, Card, Image, Button, Form } from 'react-bootstrap';
 import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { FaSearch, FaHeart, FaShoppingCart } from 'react-icons/fa';
 import Navbar2 from './Navbar2';
 import Footer from './Footer';
-
+import { useNavigate } from "react-router-dom"
+import { IsLogin } from '../IsLogin';
 
 
 
 export default function Viewprofile() {
+IsLogin()
   return (
     <div>
 

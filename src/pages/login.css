@@ -1,88 +1,77 @@
-.logcontainer {
-    font-family: Arial, sans-serif;
+.login-page {
+    background-image: url('../../public/assets/solo.webp');
     background-size: cover;
+    background-position: center;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100vw; /* Fix: Corrected from 10 0vw to 100vw */
-    margin: 0;
-    background-image: url("../../public/assets/solo-travel-woman-ready-for-traveling-picjumbo-com.jpg");
-    background-size: cover;
-    background-position: center;
 }
 
-.container1 {
+.login-container {
+    background-color: rgba(0, 0, 0, 0.7);
     padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 300px; 
-    background-color: burlywood;
-    margin: 0 auto; 
-}
-
-.form-group {
-    margin-bottom: 20px; 
-    width: 100%; 
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.form-group input {
-    width: 60%; 
-    padding: 8px;
-    border: 1px solid rgba(71, 56, 158, 0.5);
-    border-radius: 4px;
-    width: 30px;
-}
-
-button {
-    width: 100%;
-    padding: px;
-    background-color: blue;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: darkblue;
-}
-
-.loglink {
-    font-size: small;
-    color: black;
-    margin-top: 15px; /* Reduced for better spacing */
+    border-radius: 10px;
     text-align: center;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* Media Queries for Responsive Design */
-@media (max-width: 768px) {
-    .container1 {
-        width: 80%;
-        padding: 30px;
-    }
-
-    button {
-        padding: 8px;
-    }
-
-    .loglink {
-        margin-top: 20px;
-    }
+h2 {
+    color: #fff;
+    margin-bottom: 20px;
 }
 
-@media (max-width: 480px) {
-    .container1 {
-        width: 90%;
+.form-control {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    margin-bottom: 20px;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.forgot-password {
+    margin-top: 10px;
+}
+
+.forgot-password a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.social-login {
+    margin-top: 20px;
+}
+
+.social-buttons .btn {
+    margin: 5px;
+    width: 100px;
+}
+
+.social-buttons .btn-primary {
+    background-color: #3b5998;
+    border: none;
+}
+
+.social-buttons .btn-info {
+    background-color: #00aced;
+    border: none;
+}
+
+.social-buttons .btn-secondary {
+    background-color: #0077b5;
+    border: none;
+}
+
+@media (max-width: 576px) {
+    .login-container {
         padding: 20px;
     }
 
-    .form-group input, button {
-        padding: 6px;
+    .social-buttons .btn {
+        width: 80px;
     }
 }

@@ -27,8 +27,8 @@ export default function Home() {
             <p className="description">
               A leather modern utility bag is a stylish and functional accessory made from high-quality leather, featuring a minimalist design, multiple compartments for organizing essentials, and adjustable straps for comfortable carrying
             </p>
-            <Button variant="dark" className="mr-3" style={{ marginTop: '-px' ,borderRadius:'7px'}}>Shop Now</Button>
-            <Button variant="outline-dark" style={{ marginTop: 'px',borderRadius:'7px' }}>View All</Button>
+            <Button variant="dark" className="mr-3" style={{borderRadius:'1px'}}>Shop Now</Button>
+            <Button variant="outline-dark" style={{borderRadius:'1px' }}>View All</Button>
           </Col>
           <Col md={6} className="image-container">
             <img src="./assets/manbag.webp" alt="Leather Bag" className="img-fluid" />
@@ -63,7 +63,7 @@ export default function Home() {
               Professional bags are designed to offer both style and functionality, featuring sleek designs, durable materials
             </p>
             <button className="btn btn-primary">Shop Now</button>
-            <button className="btn btn-secondary">Watch Video</button>
+            <button className="btn btn-secondary" style={{marginLeft:'2px',borderRadius:'4px',height:'43px'}}>Watch Video</button>
           </div>
           <div className="col-md-4">
             <img src="/assets/hand.webp" alt="Person with Briefcase" className="img-fluid" />

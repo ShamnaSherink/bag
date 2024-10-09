@@ -79,7 +79,7 @@ export default function Registration() {
             <div className='registercontainer'>
                 <div class="container1">
 
-                    <h2 style={{textAlign:'center'}}>Register</h2>
+                    <h2 style={{textAlign:'center'}}>User Registration</h2>
 
                     <div class="form-group">
                         <label for="username" style={{ color: errorMessage?.name ? 'red' : '' }}>Name</label>
