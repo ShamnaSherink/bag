@@ -52,7 +52,7 @@ const addwishlist=(id)=>{
        <div className="d-flex justify-content-center mt-4">
         {wishlist.map((value,index)=>(
           <Card style={{ width: '18rem' }}>
-          <Card.Img variant="top" src={value.image} alt="" />
+          <Card.Img variant="top" src={`../../backend/${value.image}`} alt="" />
           <Card.Body>
           <FaHeart className="me-3"onClick={()=>{addwishlist(value.id)}} style={{ cursor: 'pointer' }} />
 

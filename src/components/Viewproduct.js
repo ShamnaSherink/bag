@@ -56,7 +56,7 @@ export default function Viewproduct() {
               <div className="card">
                 <img 
                   onClick={() => singleProduct(value.id)}
-                  src={value.image} 
+                  src={`/backend${value.image}`} 
                   className="card-img-top"
                   alt={value.image ? value.image : "Product Image"}
                 />

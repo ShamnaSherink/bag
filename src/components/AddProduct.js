@@ -81,12 +81,9 @@ export default function AddProduct() {
 
   return (
     <div>
-      {/* NAVBAR */}
       <Navbar />
-      {/* Main Navbar */}
       <Navbar2 />
 
-      {/* Add Product Form */}
       <Container fluid className="my-5">
         <Row className="justify-content-center">
           <Col md={8} lg={6}>
@@ -154,7 +151,6 @@ export default function AddProduct() {
         </Row>
       </Container>
 
-      {/* FOOTER */}
       <Footer />
     </div>
   );
