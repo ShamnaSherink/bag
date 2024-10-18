@@ -16,6 +16,11 @@ export default function Navbar2() {
     navigate('/');
   };
 
+const login=()=>{
+  navigate('/login')
+}
+
+
   const carticon = () => {
     navigate('/cart');
   };
@@ -38,6 +43,7 @@ export default function Navbar2() {
 
   return (
     <div>
+      
       <Navbar expand="lg" className="bg-white" variant="light">
         <Container>
           <Navbar.Brand href="/" className="d-flex align-items-center">
@@ -46,39 +52,100 @@ export default function Navbar2() {
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="navbar-nav" />
-
+          {role==='user'?(
+            <>
           <Navbar.Collapse id="navbar-nav" className="justify-content-center">
+          <Nav className="mx-auto">
+            <Nav.Link href="/" className="text-dark">Home</Nav.Link>
+            <Nav.Link href="/viewproduct" className="text-dark">Products</Nav.Link>
+            <Nav.Link href="/shop" className="text-dark">Shops</Nav.Link>
+            <Nav.Link href="/viewprofile" className="text-dark">Profile</Nav.Link>
+            <Nav.Link  className="text-dark">
+              <button style={{ backgroundColor: 'black', color: 'white', padding: 'px' }} onClick={logout}>Logout</button>
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+           <div className="d-flex align-items-center">
+           <FaSearch className="me-3" size={20} onClick={() => setSearchVisible(!searchVisible)} style={{ cursor: 'pointer' }} />
+           {searchVisible && (
+             <form onSubmit={handleSearchSubmit} className="d-flex me-3">
+               <input
+                 type="text"
+                 placeholder="Search..."
+                 value={searchTerm}
+                 onChange={handleSearchChange}
+                 className="form-control"
+                 style={{ width: '200px' }} 
+               />
+               <button type="submit" style={{ backgroundColor: 'black', color: 'white', border: 'none', padding: '5px 10px' }}>
+                 Search
+               </button>
+             </form>
+           )}
+           <FaHeart className="me-3" size={20} onClick={goToWishlist} style={{ cursor: 'pointer' }} />
+           <FaShoppingCart size={20} onClick={carticon} />
+
+         </div>
+      
+     </>
+          ):role==='shop'?(
+            <>
+            <Navbar.Collapse id="navbar-nav" className="justify-content-center">
             <Nav className="mx-auto">
               <Nav.Link href="/" className="text-dark">Home</Nav.Link>
               <Nav.Link href="/viewproduct" className="text-dark">Products</Nav.Link>
               <Nav.Link href="#Shop" className="text-dark">Shops</Nav.Link>
               <Nav.Link href="/viewprofile" className="text-dark">Profile</Nav.Link>
-              <Nav.Link href="#LOGOUT" className="text-dark">
+              <Nav.Link  className="text-dark">
                 <button style={{ backgroundColor: 'black', color: 'white', padding: 'px' }} onClick={logout}>Logout</button>
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
+             <div className="d-flex align-items-center">
+             <FaSearch className="me-3" size={20} onClick={() => setSearchVisible(!searchVisible)} style={{ cursor: 'pointer' }} />
+             {searchVisible && (
+               <form onSubmit={handleSearchSubmit} className="d-flex me-3">
+                 <input
+                   type="text"
+                   placeholder="Search..."
+                   value={searchTerm}
+                   onChange={handleSearchChange}
+                   className="form-control"
+                   style={{ width: '200px' }} 
+                 />
+                 <button type="submit" style={{ backgroundColor: 'black', color: 'white', border: 'none', padding: '5px 10px' }}>
+                   Search
+                 </button>
+               </form>
+             )}
+             <FaHeart className="me-3" size={20} onClick={goToWishlist} style={{ cursor: 'pointer' }} />
+             <FaShoppingCart size={20} onClick={carticon} />
+           </div>
+           </>
 
-          <div className="d-flex align-items-center">
-            <FaSearch className="me-3" size={20} onClick={() => setSearchVisible(!searchVisible)} style={{ cursor: 'pointer' }} />
-            {searchVisible && (
-              <form onSubmit={handleSearchSubmit} className="d-flex me-3">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="form-control"
-                  style={{ width: '200px' }} 
-                />
-                <button type="submit" style={{ backgroundColor: 'black', color: 'white', border: 'none', padding: '5px 10px' }}>
-                  Search
-                </button>
-              </form>
-            )}
-            <FaHeart className="me-3" size={20} onClick={goToWishlist} style={{ cursor: 'pointer' }} />
-            <FaShoppingCart size={20} onClick={carticon} />
-          </div>
+          ):
+
+        (
+          <>
+           <Navbar.Collapse id="navbar-nav" className="justify-content-center">
+          <Nav className="mx-auto">
+            <Nav.Link href="/" className="text-dark">Home</Nav.Link>
+            {/* <Nav.Link href="/viewproduct" className="text-dark">Products</Nav.Link> */}
+            <Nav.Link href="#Shop" className="text-dark">Shops</Nav.Link>
+            {/* <Nav.Link href="/viewprofile" className="text-dark">Profile</Nav.Link> */}
+            <Nav.Link  className="text-dark">
+              <button style={{ backgroundColor: 'black', color: 'white', padding: 'px' }} onClick={login}>Login</button>
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+         
+          
+          </>
+        )
+
+        }
+
+
         </Container>
       </Navbar>
     </div>

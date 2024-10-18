@@ -92,7 +92,10 @@ export default function Login() {
           </button>
         </form>
         <div className="forgot-password">
-        <span style={{color:'white'}}>Already have an account?</span> <a href="/"><span style={{color:'black',textDecoration:'none'}}> <b >Sign In</b></span></a>
+        <span style={{color:'white'}}>Dont have an account yet?</span><br></br> <a href="/user-registration"><span style={{color:'black',textDecoration:'none'}}> <b >Create User Account </b></span></a><br></br>
+        <span style={{color:'white'}}></span> <a href="/shopregistration"><span style={{color:'black',textDecoration:'none'}}> <b >Create Shop Account</b></span></a>
+       <br></br><br></br> <span style={{color:'white'}}>forgot password</span><br></br> <a href="/user-registration"><span style={{color:'black',textDecoration:'none'}}> <b ></b></span></a><br></br>
+
         </div>
         </div>
     </div>

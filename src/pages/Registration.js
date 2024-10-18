@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import './registration.css'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 export default function Registration() {
     const [input, setInput] = useState({
@@ -14,6 +15,7 @@ export default function Registration() {
 
 
     const [errorMessage, setErrorMessage] = useState({})
+    const navigate=useNavigate()
 
     const validate = () => {
 
@@ -40,13 +42,15 @@ export default function Registration() {
     }
 
     const submit = (event) => {
-        // event.preventDefault()
+        event.preventDefault()
         if (!validate()) {
             return console.log('error');
 
         }
         axios.post('http://127.0.0.1:8000/registration/', input).then((response) => {
             console.log('response==>',response);
+
+            navigate('/')
 
         }).catch((error) => {
             console.log('error==>',error);
