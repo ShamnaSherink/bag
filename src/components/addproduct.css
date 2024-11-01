@@ -1,95 +1,46 @@
-/* Navbar.css */
-.top-navbar {
-    background-color: black;
-    color: white;
-    padding: 5px 0;
+.add-product-page {
+  background-color: #f7f8fa;
+  min-height: 100vh;
 }
 
-.top-links a {
-    color: white;
-    margin-left: 20px;
-    text-decoration: none;
+.custom-card {
+  border-radius: 15px;
+  background-color: #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
-.top-links a:hover {
-    text-decoration: underline;
+.custom-card:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
-.navbar-nav .nav-link {
-    color: black;
-    margin-left: 15px;
+.custom-input {
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
-.navbar-brand {
-    font-weight: bold;
+.custom-button {
+  padding: 10px;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  background-color: #007bff;
+  transition: background-color 0.3s ease;
 }
 
-
-
-
-/* * NAVBAR:2 */ 
-
-.top-navbar {
-    background-color: black;
-    color: white;
-    padding: 10px 0;
-    text-align: center;
+.custom-button:hover {
+  background-color: #0056b3;
 }
 
-.top-navbar .top-links a {
-    color:black;
-    margin-left: 20px;
-    text-decoration: none;
+.card h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  color: #333;
 }
 
-.top-navbar .top-links a:hover {
-    text-decoration: underline;
+.form-label {
+  font-weight: 500;
+  font-size: 0.9rem;
 }
 
-.navbar-nav .nav-link {
-    color: black;
-}
-
-.navbar-nav.mx-auto .nav-item {
-    padding: 0 15px;
-}
-
-.navbar-brand {
-    font-weight: bold;
-}
-
-
-
-
-/* FOOTER:- */
-.footer {
-    background-color: #f8f9fa;
-    padding: 30px 0;
-  }
-  
-  .footer-bottom {
-    background-color: #343a40;
-    padding: 20px 0;
-  }
-  
-  .footer-bottom h6 {
-    font-weight: bold;
-  }
-  
-  .footer-bottom ul {
-    list-style-type: none;
-    padding-left: 0;
-  }
-  
-  .footer-bottom ul li {
-    margin-bottom: 10px;
-  }
-  
-  .footer-bottom p.small {
-    color: #adb5bd;
-  }
-  
-  .footer-bottom .form-control {
-    max-width: 300px;
-  }
-  

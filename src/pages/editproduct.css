@@ -1,0 +1,47 @@
+.edit-product-page {
+    background-color: #f9f9f9;
+    min-height: 100vh;
+  }
+  
+  .card {
+    border-radius: 15px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h3 {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .form-control {
+    margin-bottom: 15px;
+  }
+  
+  button {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+  }
+  
+  /* Responsive */
+  @media (max-width: 576px) {
+    .card {
+      width: 100%;
+    }
+  
+    h3 {
+      font-size: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .card {
+      padding: 20px;
+    }
+  }
+  

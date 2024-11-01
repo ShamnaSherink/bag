@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import './viewproduct.css';
+// import './viewproduct.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Navbar2 from './Navbar2';
-import Footer from './Footer';
 import toast, { Toaster } from 'react-hot-toast';
+import Navbar2 from '../components/Navbar2';
 
-export default function Viewproduct() {
+export default function Shopaddproduct() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-console.log(products);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -51,21 +49,18 @@ console.log(products);
       user_id: JSON.parse(localStorage.getItem('login_id')),
       product_id: id,
     };
-    console.log(cartData);
-    
 
     try {
       const response = await axios.post('http://127.0.0.1:8000/add_cart_api/', cartData);
       toast.success(response.data.message);
     } catch (error) {
-      console.log(error);
-      
       toast.error(error.response?.data?.message || 'Error adding to cart');
     }
   };
 
   return (
     <div>
+        
       <div className="top-navbar d-flex justify-content-between align-items-center px-4">
         <div>Get 1 Product Free With 200.00 $ Order</div>
         <div className="top-links">
@@ -74,7 +69,7 @@ console.log(products);
           <a href="/" style={{color:'white'}}>Gift Certificates</a>
         </div>
       </div>
-      <Navbar2 />
+      <Navbar2/>
       <div className="container mt-5">
         <Toaster />
         <h2 className="text-center" style={{color:'black'}}>All Products</h2>
@@ -102,16 +97,7 @@ console.log(products);
                         {product.name}
                       </h5>
                       <p className="card-text">Rs. {product.price}</p>
-                      <i
-                        style={{ fontSize: '20px', cursor: 'pointer' }}
-                        className="fa-solid fa-cart-shopping"
-                        onClick={() => addCart(product.id)}
-                      ></i>
-                      <i
-                        style={{ marginLeft: '25px', fontSize: '23px', cursor: 'pointer' }}
-                        className="fa-regular fa-heart"
-                        onClick={() => addWishlist(product.id)}
-                      ></i>
+                   
                     </div>
                   </div>
                 </div>
@@ -122,7 +108,6 @@ console.log(products);
           </div>
         )}
       </div>
-      <Footer />
     </div>
   );
 }

@@ -13,7 +13,9 @@ export default function Navbar2() {
 
   const logout = () => {
     localStorage.clear();
-    navigate('/');
+    window.location.reload()
+    navigate('/login');
+
   };
 
 const login=()=>{
@@ -59,7 +61,9 @@ const login=()=>{
             <Nav.Link href="/" className="text-dark">Home</Nav.Link>
             <Nav.Link href="/viewproduct" className="text-dark">Products</Nav.Link>
             <Nav.Link href="/shop" className="text-dark">Shops</Nav.Link>
-            <Nav.Link href="/viewprofile" className="text-dark">Profile</Nav.Link>
+            <Nav.Link href="userprofile" className="text-dark">Profile</Nav.Link>
+            <Nav.Link href="/placeorder" className="text-dark">My Orders</Nav.Link>
+
             <Nav.Link  className="text-dark">
               <button style={{ backgroundColor: 'black', color: 'white', padding: 'px' }} onClick={logout}>Logout</button>
             </Nav.Link>
@@ -91,36 +95,18 @@ const login=()=>{
           ):role==='shop'?(
             <>
             <Navbar.Collapse id="navbar-nav" className="justify-content-center">
-            <Nav className="mx-auto">
+            <Nav className="mx-auto"> 
               <Nav.Link href="/" className="text-dark">Home</Nav.Link>
-              <Nav.Link href="/viewproduct" className="text-dark">Products</Nav.Link>
-              <Nav.Link href="#Shop" className="text-dark">Shops</Nav.Link>
-              <Nav.Link href="/viewprofile" className="text-dark">Profile</Nav.Link>
+              <Nav.Link href="/shopaddproduct" className="text-dark">Products</Nav.Link>
+              <Nav.Link href="/shopprofile" className="text-dark">Profile</Nav.Link>
+              <Nav.Link href="/addproduct" className="text-dark">Add Product</Nav.Link>
+              <Nav.Link href="/shopownproduct" className="text-dark">My Products</Nav.Link>
               <Nav.Link  className="text-dark">
                 <button style={{ backgroundColor: 'black', color: 'white', padding: 'px' }} onClick={logout}>Logout</button>
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
-             <div className="d-flex align-items-center">
-             <FaSearch className="me-3" size={20} onClick={() => setSearchVisible(!searchVisible)} style={{ cursor: 'pointer' }} />
-             {searchVisible && (
-               <form onSubmit={handleSearchSubmit} className="d-flex me-3">
-                 <input
-                   type="text"
-                   placeholder="Search..."
-                   value={searchTerm}
-                   onChange={handleSearchChange}
-                   className="form-control"
-                   style={{ width: '200px' }} 
-                 />
-                 <button type="submit" style={{ backgroundColor: 'black', color: 'white', border: 'none', padding: '5px 10px' }}>
-                   Search
-                 </button>
-               </form>
-             )}
-             <FaHeart className="me-3" size={20} onClick={goToWishlist} style={{ cursor: 'pointer' }} />
-             <FaShoppingCart size={20} onClick={carticon} />
-           </div>
+            
            </>
 
           ):
@@ -130,9 +116,7 @@ const login=()=>{
            <Navbar.Collapse id="navbar-nav" className="justify-content-center">
           <Nav className="mx-auto">
             <Nav.Link href="/" className="text-dark">Home</Nav.Link>
-            {/* <Nav.Link href="/viewproduct" className="text-dark">Products</Nav.Link> */}
-            <Nav.Link href="#Shop" className="text-dark">Shops</Nav.Link>
-            {/* <Nav.Link href="/viewprofile" className="text-dark">Profile</Nav.Link> */}
+            <Nav.Link href="/shop" className="text-dark">Shops</Nav.Link>
             <Nav.Link  className="text-dark">
               <button style={{ backgroundColor: 'black', color: 'white', padding: 'px' }} onClick={login}>Login</button>
             </Nav.Link>

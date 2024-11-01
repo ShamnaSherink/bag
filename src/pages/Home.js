@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -8,13 +8,35 @@ import Navbar from '../components/Navbar';
 import Navbar2 from '../components/Navbar2';
 import { Card } from 'react-bootstrap';
 import Footer from '../components/Footer';
+import { useNavigate } from 'react-router-dom';
 
 
 
 
 export default function Home() {
+
+  const [role, setRole] =useState(JSON.parse(localStorage.getItem('role')));
+
+  console.log(role);
+  
+
+  const navigate=useNavigate()
+
+  const viewall=()=>{
+    if (role==null){
+      return navigate('/login')
+
+    }else{
+      navigate('/viewproduct')
+
+    }
+  }
+
+
   return (
     <div>
+      
+
       <Navbar />
 
       <Navbar2 /><br></br>
@@ -27,9 +49,17 @@ export default function Home() {
             <p className="description">
               A leather modern utility bag is a stylish and functional accessory made from high-quality leather, featuring a minimalist design, multiple compartments for organizing essentials, and adjustable straps for comfortable carrying
             </p>
-            <Button variant="dark" className="mr-3" style={{borderRadius:'1px'}}>Shop Now</Button>
-            <Button variant="outline-dark" style={{borderRadius:'1px' }}>View All</Button>
-          </Col>
+            <Button variant="dark" className="mr-3" style={{borderRadius:'1px'}}>Shop Now</Button> &nbsp;&nbsp;&nbsp;
+
+            <i class="fa-solid fa-arrow-right fa-beat"></i>
+
+            &nbsp;&nbsp;&nbsp;
+
+            
+              <Button   variant="outline-dark" style={{borderRadius:'1px' }}  onClick={viewall}>View All</Button>
+        
+
+              </Col>
           <Col md={6} className="image-container">
             <img src="./assets/manbag.webp" alt="Leather Bag" className="img-fluid" />
           </Col>
@@ -262,7 +292,7 @@ export default function Home() {
               <Card.Img variant="top" src="./assets/shop-3.webp" />
 
               <Card.Body style={{ marginTop: '20px' }}>
-                <h2>30% OFF</h2>
+                <h2 style={{color:'black'}}>30% OFF</h2>
                 <p style={{ marginTop: 'px' }}>ALL LUXURY BRANDS</p>
                 <p>CODE: LUXURY</p>
               </Card.Body>

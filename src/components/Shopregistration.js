@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import './shopregistration.css'
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
-import { Navigate, useNavigate } from 'react-router-dom';
 
 
 
@@ -12,17 +11,26 @@ export default function Shopregistration() {
     email: '',
     password: '',
     address: '',
-    phone_number: ''
+    phone_number: '',
+    image: '',
+    login_id: localStorage.getItem('login_id')
   });
   console.log(input);
 
   const [errorMessage, setErrorMessage] = useState({});
-  const navigate=useNavigate()
+  console.log(errorMessage);
 
+
+
+  const inputChange = (event) => {
+    const name = event.target.name; 
+    const value = event.target.value;
+    setInput({ ...input, [name]: value });
+  };
 
   const validate = () => {
     console.log('event');
-    const error = {}; //object
+    const error = {}; 
     if (input.shop_name === '') {
       error.shop_name = 'Enter your name';
     }
@@ -48,34 +56,35 @@ export default function Shopregistration() {
     if (!validate()) {
       return console.log('error');
     }
-    axios.post('http://127.0.0.1:8000/shop_registration_api', input).then((response) => {
+
+
+
+    const data = new FormData();
+    data.append('shop_name', input.shop_name);
+    data.append('email', input.email);
+    data.append('password', input.password);
+    data.append('address', input.address);
+    data.append('phone_number', input.phone_number);
+    data.append('image', input.image);
+
+    axios.post('http://127.0.0.1:8000/shop_registration_api', data).then((response) => {
       console.log('response==>', response);
-      
-      toast.success(response.data.message)
-      navigate('/')
-
-
-
-
-
-    }).catch((error) => {
-      console.log('error==>', error);
-      toast.error(error)
-    });
-
-    console.log('hello');
+      console.log('response==>', response);
+      toast.success('Product added successfully!');
+    })
+      .catch((error) => {
+        console.log('error==>', error);
+        toast.error('Failed to add product.');
+      });
   };
 
-  const inputChange = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
+  console.log('hello');
 
-    setInput({ ...input, [name]: value });
-  };
+
 
   return (
-    <div className="registration-container"> 
-    <Toaster/>
+    <div className="registration-container">
+      <Toaster />
       <div className="form-container">
         <h2 className="text-center">Shop Registration</h2>
         <form>
@@ -143,6 +152,22 @@ export default function Shopregistration() {
               id="phone_number"
               required
             />
+            <input
+              style={{ borderColor: errorMessage?.phone_number ? 'red' : '' }}
+              type="file"
+              name="image"
+              className="form-control"
+              onClick={() => { setErrorMessage({ ...errorMessage, phone_number: '' }) }}
+              onChange={(event) => { setInput({ ...input, image: event.target.files[0] }); }}
+
+              id=""
+              required
+            />
+
+
+
+
+
           </div>
           <button type="submit" className="btn btn-primary w-100" onClick={submit}>Register</button>
         </form>
