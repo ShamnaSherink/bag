@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 
-
 export default function Edit_shopprofile() {
     const [input, setInput] = useState({
         shop_name: '',
@@ -12,10 +11,10 @@ export default function Edit_shopprofile() {
         address: '',
         phone_number: '',
         image: '',
-        shop_id: localStorage.getItem('shop_id')
     });
     console.log(input);
     
+
     const { id } = useParams();
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState({});
@@ -24,7 +23,6 @@ export default function Edit_shopprofile() {
         const login_id = JSON.parse(localStorage.getItem('login_id'));
         axios.get(`http://127.0.0.1:8000/view_shop_profile_api/${login_id}`)
             .then((response) => {
-                console.log(response);  
                 setInput({
                     shop_name: response.data?.shop_name || '',
                     address: response.data?.address || '',
@@ -59,11 +57,12 @@ export default function Edit_shopprofile() {
         }
         data.append('password', input.password);
 
-        axios.post('http://127.0.0.1:8000/update_shop_profile_api/', data)
+        axios.put(`http://127.0.0.1:8000/update_shop_profile_api/${id}`, data)
             .then((response) => {
-                console.log('Response:', response);
-                toast.success('Profile edited successfully!');
-                navigate('/');
+                console.log(response.data.data);
+                
+                toast.success('Profile edited successfully!'); 
+                navigate('/shopprofile');
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -90,10 +89,11 @@ export default function Edit_shopprofile() {
 
     return (
         <div className="registration-container">
-            <Toaster />
             <div className="form-container">
                 <h2 style={{ color: 'black' }} className="text-center">Shop Profile</h2>
                 <form onSubmit={submit}>
+            <Toaster /> {/* This should be present here */}
+
                     <div className="form-group mb-3">
                         <label htmlFor="shop_name" style={{ color: errorMessage?.shop_name ? 'red' : '' }}>
                             Shop Name
@@ -148,9 +148,12 @@ export default function Edit_shopprofile() {
                             onChange={(event) => { setInput({ ...input, image: event.target.files[0] }); }}
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary w-100">Update Profile</button>
+                    <button type="submit" className="btn btn-primary w-100" >Update Profile</button>
                 </form>
             </div>
         </div>
     );
 }
+
+
+

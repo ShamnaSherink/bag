@@ -4,23 +4,27 @@ import { Card, Button, Image, Col, Container, Row } from 'react-bootstrap';
 import Navbar from '../components/Navbar';
 import Navbar2 from '../components/Navbar2';
 import Footer from '../components/Footer';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Shopprofile() {
     const [shop, setShop] = useState({});
+    const navigate=useNavigate()
     
     useEffect(() => {
         const login_id = JSON.parse(localStorage.getItem('login_id'));
         
         axios.get(`http://127.0.0.1:8000/view_shop_profile_api/${login_id}`)
             .then((response) => {
+                
                 setShop(response.data);
             })
             .catch((error) => {
                 console.error("Error fetching shop profile", error);
             });
     }, []);
-    
+    const editShop=(shop_id)=>{
+navigate(`/editshopprofile/${shop_id}`)
+    }
     return (
         <div>
             <Navbar />
@@ -48,9 +52,9 @@ export default function Shopprofile() {
                                 <Card.Text>{shop.email}</Card.Text>
                                 <Card.Text>{shop.phone_number}</Card.Text>
                                 
-                                <Link to="/editshopprofile">
-                                    <Button variant="primary" className="mt-2">Edit Profile</Button>
-                                </Link>
+                                {/* <Link to="/editshopprofile"> */}
+                                    <Button variant="primary" className="mt-2" onClick={()=>{editShop(shop.login_id)}}>Edit Profile</Button>
+                                {/* </Link> */}
                             </Card.Body>
                         </Card>
                     </Col>

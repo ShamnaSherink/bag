@@ -15,22 +15,24 @@ export default function EditProduct() {
     price: '',
     quantity: '',
     image: '',
-    shop_id: localStorage.getItem('shop_id')
+    login_id: localStorage.getItem('login_id')
   });
   
   console.log(input);
 
-  const { id } = useParams();
+
+
   const navigate = useNavigate();
   const [shop, setShop] = useState({});
   const [errorMessage, setErrorMessage] = useState({});
+  const { id } = useParams();
+  console.log(id);
 
   useEffect(() => {
-    const login_id = JSON.parse(localStorage.getItem('login_id'));
-    console.log(login_id);
+    // const login_id = JSON.parse(localStorage.getItem('login_id'));
     
     
-    axios.post(`http://127.0.0.1:8000/view_single_shop_product/${login_id}`)
+    axios.post(`http://127.0.0.1:8000/view_single_shop_product/${id}`)
       .then((response) => {
         console.log(response);
         setShop(response.data.data);
@@ -65,14 +67,14 @@ export default function EditProduct() {
     data.append('description', input.description);
     data.append('price', input.price);
     data.append('quantity', input.quantity);
+    data.append('login_id',JSON.parse(localStorage.getItem('login_id')))
 
     if (input.image instanceof File) {
       data.append('image', input.image);
     }
 
-    data.append('product_id', id);  
 
-    axios.post('http://127.0.0.1:8000/update_single_shop_product/', data)
+    axios.post(`http://127.0.0.1:8000/update_single_shop_product/${id}`, data)
       .then((response) => {
         console.log('Response:', response);
         toast.success('Product updated successfully');

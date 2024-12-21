@@ -44,11 +44,13 @@ function App() {
           <Route path='/shop'element={<Shop/>}/>
           <Route path='/userprofile'element={<Userprofile/>}/>
           <Route path='/placeorder'element={<Place_order/>}/>
-          <Route path='/editprofile'element={<EditProfileUser/>}/>
+          <Route path='/editprofile/:id'element={<EditProfileUser/>}/>
           <Route path='/shopprofile'element={<Shopprofile/>}/>
-          <Route path='/editshopprofile'element={<Edit_shopprofile/>}/>
+          {/* <Route path='/editshopprofile'element={<Edit_shopprofile/>}/> */}
+          <Route path="/editshopprofile/:id" element={<Edit_shopprofile />} />
+
           <Route path='/shopownproduct'element={<Shopownproduct/>}/>
-          <Route path='/editproduct/:login_id'element={<Editproduct/>}/>
+          <Route path='/editproduct/:id'element={<Editproduct/>}/>
           <Route path='/shopaddproduct'element={<Shopaddproduct/>}/>
           
           

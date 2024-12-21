@@ -5,18 +5,28 @@ import { useNavigate } from 'react-router-dom';
 import Navbar2 from './Navbar2';
 import Footer from './Footer';
 import toast, { Toaster } from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { getproducts } from '../redux/slice/Productslice';
 
 export default function Viewproduct() {
+
+const  viewproducts=useSelector(state=>state.products.viewproducts)
+console.log(viewproducts);
+
+  const dispatch=useDispatch()
+
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 console.log(products);
 
   useEffect(() => {
+    dispatch(getproducts())
+
     const fetchProducts = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:8000/view_product_api/');
-        setProducts(response.data.data);
+        // setProducts(response.data.data);
       } catch (error) {
         console.error('Error fetching products:', error);
         toast.error('Failed to fetch products');
@@ -64,6 +74,7 @@ console.log(products);
     }
   };
 
+
   return (
     <div>
       <div className="top-navbar d-flex justify-content-between align-items-center px-4">
@@ -87,8 +98,8 @@ console.log(products);
           </div>
         ) : (
           <div className="row">
-            {products.length > 0 ? (
-              products.map((product) => (
+            {viewproducts.length > 0 ? (
+              viewproducts.map((product) => (
                 <div key={product.id} className="col-md-3">
                   <div className="card">
                     <img

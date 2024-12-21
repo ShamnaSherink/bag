@@ -42,10 +42,10 @@ export default function Shopownproduct() {
     console.log('data===>',data);
 
     axios
-      .get(`http://127.0.0.1:8000/view_single_shop_product?login_id=${login_id}`)
+      .get(`http://127.0.0.1:8000/view_single_shop_product/${login_id}`)
       .then((response) => {
-        console.log('res====>',response.data.data);
-        setView(response.data.data)
+        console.log('res====>',response);
+        setView(response.data)
       })
       .catch((error) => {
         console.error('Error fetching data', error);
@@ -58,7 +58,7 @@ export default function Shopownproduct() {
       <Navbar2 />
       <div className="product-card">
         <Row className="justify-content-center">
-          {view.length > 0 ? (
+          {view.length   > 0 ? (
             view.map((product) => (
               <Col md={6} sm={12} key={product.id}>
                 <Card className="border-0 shadow p-3 mb-9 bg-white rounded">
